@@ -227,6 +227,43 @@ textarea.code{width:100%;min-height:84px;border:2px solid var(--chip-edge);borde
 .toggle{display:flex;gap:10px;align-items:center;font-weight:700}
 .toggle input{width:22px;height:22px;accent-color:var(--sea)}
 .filelab{display:inline-block;cursor:pointer}
+/* v4 : défi, tuiles, coffre, histoires, cartes */
+.revcard.daily{border-left-color:var(--sea)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;margin-top:14px}
+.tile{background:var(--surface);border:2px solid var(--line);border-bottom-width:5px;border-radius:16px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;font-weight:800;font-size:14.5px}
+.tile span{font-size:26px;line-height:1.1}
+.tile small{color:var(--muted);font-weight:600;font-size:12.5px}
+.muted{color:var(--muted);font-family:var(--body);font-size:14px;font-weight:600}
+.card.locked{opacity:.6;filter:grayscale(.8)}
+.card.locked small{color:var(--muted);font-size:12px;line-height:1.3}
+.gift{background:var(--olive-bg);border-radius:14px;padding:10px 12px;margin:-8px 0 18px;font-size:15px;color:var(--ink)}
+.gift .pill{margin-left:6px;font-size:13.5px;padding:3px 10px}
+.story-list{display:grid;gap:10px}
+.story-row{display:flex;gap:12px;align-items:center;text-align:left;background:var(--surface);border:2px solid var(--line);border-bottom-width:5px;border-radius:16px;padding:10px 14px}
+.story-row b{display:block}
+.story-row small{color:var(--muted);font-size:13.5px}
+.story-row.locked{opacity:.6;cursor:not-allowed}
+.semoji{font-size:30px;flex:none;width:40px;text-align:center}
+.story-head{display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:center;margin-bottom:6px}
+.story-head .screen-title{font-size:clamp(22px,6vw,28px)}
+.story-lines{display:grid;gap:8px;margin:8px 0 10px}
+.sline{display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:start}
+.sline .speak.sm{margin:6px 0 0}
+.stext{background:var(--surface);border:2px solid var(--line);border-radius:4px 16px 16px 16px;padding:8px 12px;text-align:left;font-size:17.5px;line-height:1.45}
+.stext small{display:block;color:var(--muted);font-size:14.5px;font-weight:400;margin-top:3px}
+.sq{margin:12px 0}
+.sq p{margin:0 0 8px}
+.opt.right{border-color:var(--olive);background:var(--olive-bg)}
+.opt.wrong{border-color:var(--pom);background:var(--pom-bg)}
+.opt:disabled{cursor:default}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.ccard{background:var(--surface);border:2px solid var(--line);border-bottom-width:5px;border-radius:18px;padding:14px}
+.ccard .cemoji{font-size:34px;line-height:1.1;margin-bottom:4px}
+.ccard b{display:block;font-family:var(--display);font-size:17px;color:var(--sea)}
+.ccard small{color:var(--muted);font-size:13px}
+.ccard p{margin:8px 0;font-size:15px;line-height:1.5}
+.ccard.locked{opacity:.6;border-style:dashed}
+.cword{background:var(--sea-soft);border-radius:12px;padding:6px 10px;font-size:15px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -251,6 +288,9 @@ textarea.code{width:100%;min-height:84px;border:2px solid var(--chip-edge);borde
   </div>
   <h2 class="map-title">La tenue d’Otto</h2>
   <div class="grid skins" id="skinGrid" role="radiogroup" aria-label="Tenues d’Otto"></div>
+  <h2 class="map-title">🎁 Le coffre aux trésors <small class="muted" id="prizeCount"></small></h2>
+  <p class="map-sub">Ces tenues se gagnent en jouant.</p>
+  <div class="grid skins" id="prizeGrid" style="margin-top:12px" role="radiogroup" aria-label="Tenues à gagner"></div>
   <div class="sticky-go">
     <button class="btn primary" id="setupGo">Embarquer</button>
     <button class="btn ghost" id="setupCancel">Annuler</button>
@@ -278,14 +318,23 @@ textarea.code{width:100%;min-height:84px;border:2px solid var(--chip-edge);borde
     <div class="hero-actions">
       <button class="pill" id="outfitBtn">👕 Changer la tenue d’Otto</button>
       <button class="pill" id="switchBtn">👥 Changer de joueur</button>
-      <button class="pill" id="carnetBtn">📘 Carnet</button>
-      <button class="pill" id="backupBtn">💾 Sauvegarde</button>
+    </div>
+    <div class="revcard daily">
+      <div><b>⚡ Défi du jour</b><span id="dailyText"></span></div>
+      <button class="btn primary small" id="dailyBtn">Relever</button>
     </div>
     <div class="revcard">
       <div><b>🔁 Révision du jour</b><span id="revText"></span></div>
       <button class="btn primary small" id="revBtn">Réviser</button>
     </div>
-    <h2 class="map-title" id="mapTitle">Ton voyage en 15 îles</h2>
+    <div class="tiles">
+      <button class="tile" id="storiesBtn"><span>📚</span>Histoires<small id="storiesCount"></small></button>
+      <button class="tile" id="cardsBtn"><span>🃏</span>Cartes<small id="cardsCount"></small></button>
+      <button class="tile" id="alphaBtn"><span>🔤</span>Alphabet<small>Atelier</small></button>
+      <button class="tile" id="carnetBtn"><span>📘</span>Carnet<small>Vocabulaire</small></button>
+      <button class="tile" id="backupBtn"><span>💾</span>Sauvegarde<small>et réglages</small></button>
+    </div>
+    <h2 class="map-title" id="mapTitle">Ton voyage en 16 îles</h2>
     <p class="map-sub" id="mapSub"></p>
     <div class="map" id="map"></div>
     <button class="reset" id="resetBtn">Recommencer mon voyage à zéro</button>
@@ -321,7 +370,9 @@ textarea.code{width:100%;min-height:84px;border:2px solid var(--chip-edge);borde
     <h2 id="resTitle"></h2>
     <p id="resText"></p>
     <div class="xp" id="resXp"></div>
+    <div class="gift" id="resGift" hidden></div>
     <button class="btn primary" id="resMain"></button>
+    <button class="btn ghost" id="resStory" hidden></button>
     <button class="btn ghost" id="resBack">Retour à la carte</button>
   </div>
 </section>
@@ -333,6 +384,35 @@ textarea.code{width:100%;min-height:84px;border:2px solid var(--chip-edge);borde
   <p class="screen-sub">Les mots des îles que tu as débloquées. Touche 🔊 pour les entendre.</p>
   <input class="search" id="vSearch" type="search" placeholder="Chercher en français ou en grec" aria-label="Chercher un mot">
   <div id="vList"></div>
+</main></section>
+
+<!-- Histoires -->
+<section id="stories" hidden><main class="wrap screen-pad">
+  <button class="back" id="storiesBack">← Retour à la carte</button>
+  <h1 class="screen-title">Les histoires d’Otto</h1>
+  <p class="screen-sub">Une petite histoire par île, à lire et à écouter. Chaque île terminée débloque la sienne.</p>
+  <div id="storyList" class="story-list"></div>
+</main></section>
+
+<section id="story" hidden><main class="wrap screen-pad">
+  <button class="back" id="storyBack">← Toutes les histoires</button>
+  <div class="story-head"><div class="otto-wrap" id="storyOtto"></div><div><h1 class="screen-title" id="storyTitle"></h1><p class="screen-sub" id="storyIsle" style="margin:0"></p></div></div>
+  <div class="row" style="margin:6px 0 14px"><button class="pill" id="storyAll">🔊 Écouter toute l’histoire</button><button class="pill" id="storyTr">Tout traduire</button></div>
+  <p class="locked-note">Touche une phrase pour voir sa traduction.</p>
+  <div id="storyLines" class="story-lines"></div>
+  <h2 class="map-title">As-tu bien compris ?</h2>
+  <div id="storyQs"></div>
+  <p class="msg ok" id="storyEnd" hidden></p>
+  <h2 class="map-title">🃏 Carte culture</h2>
+  <div id="storyCard" style="margin-top:10px"></div>
+</main></section>
+
+<!-- Cartes culture -->
+<section id="cards" hidden><main class="wrap screen-pad">
+  <button class="back" id="cardsBack">← Retour à la carte</button>
+  <h1 class="screen-title">Ma collection de cartes</h1>
+  <p class="screen-sub" id="cardsSub"></p>
+  <div class="card-grid" id="cardGrid"></div>
 </main></section>
 
 <!-- Sauvegarde -->
@@ -373,7 +453,7 @@ textarea.code{width:100%;min-height:84px;border:2px solid var(--chip-edge);borde
 
 <script>
 /* =========================================================
-   CONTENU : 15 îles × 15 exercices, chacun avec son explication (g)
+   CONTENU : 16 îles × 15 exercices, chacun avec son explication (g)
    mc : choix multiple (1re option = bonne)    f : phrase à trou
    b  : construire la phrase grecque           m : associer des paires
    l  : écouter et choisir le sens             lb : écouter et reconstruire
@@ -646,6 +726,25 @@ const LEVELS = [
  {t:"b",q:"À plus, bisous !",a:"Τα λέμε, φιλιά!",x:["λέω","φιλί"],g:"Τα λέμε = à plus. φιλιά est le pluriel de φιλί (bisou)."},
  {t:"mc",q:"Ulysse a mis dix ans à rentrer à Ithaque. En grec, « οδύσσεια » désigne aussi…",o:["un voyage long et plein d’imprévus","un téléphone portable","un plat de poisson","un mot de passe"],g:"Comme en français, une οδύσσεια est un long périple semé d’embûches. Otto connaît bien ça !"}
 ]},
+{isle:"Κως", theme:"La santé et le corps",
+ rules:["Avoir mal : με πονάει + partie du corps au singulier, με πονάνε au pluriel.","Le possessif suit la partie du corps : με πονάει το κεφάλι μου.","Être malade : είμαι άρρωστος / άρρωστη ; avoir de la fièvre : έχω πυρετό.","Formules utiles : Περαστικά ! (bon rétablissement), Πρόσεξε ! (fais attention)."],
+ ex:[
+ {t:"m",p:[["το κεφάλι","la tête"],["το χέρι","la main, le bras"],["το πόδι","le pied, la jambe"],["το μάτι","l’œil"],["το αυτί","l’oreille"]],g:"Les parties du corps sont souvent neutres en -ι. Remarque : χέρι et πόδι désignent aussi le bras et la jambe entiers."},
+ {t:"f",s:"Με πονάει το ___ μου.",h:"J’ai mal à la tête.",o:["κεφάλι","πόδι","αυτί"],g:"Με πονάει = « me fait mal ». Ce qui fait mal est le sujet : το κεφάλι μου (ma tête)."},
+ {t:"f",s:"Με ___ τα πόδια μου.",h:"J’ai mal aux pieds.",o:["πονάνε","πονάει","πονάω"],g:"Si ce qui fait mal est au pluriel, le verbe aussi : με πονάνε (ou πονούν) τα πόδια μου."},
+ {t:"mc",q:"Quand quelqu’un est malade, on lui dit « Περαστικά! ». Ça veut dire…",o:["Bon rétablissement !","Bon voyage !","Santé !","À tes souhaits !"],g:"Περαστικά vient de περνάω (passer) : « que ça passe vite ! »."},
+ {t:"l",a:"Έχω πυρετό από χθες.",o:["J’ai de la fièvre depuis hier.","J’avais froid hier.","J’ai faim depuis hier.","Je vais chez le médecin demain."],g:"ο πυρετός = la fièvre (comme « pyrétique »). από χθες = depuis hier."},
+ {t:"d",lines:[["Γιατρός","Τι έχετε;","Qu’est-ce qui ne va pas ?"]],q:"Tu as mal à la gorge. Que réponds-tu ?",o:["Με πονάει ο λαιμός μου.","Έχω έναν λαιμό.","Ο λαιμός μου είναι πολύ ακριβός.","Πονάω τον γιατρό."],g:"ο λαιμός = la gorge ou le cou. Τι έχετε; (« qu’avez-vous ? ») est la question classique du médecin."},
+ {t:"mc",q:"Où achète-t-on des médicaments ?",o:["στο φαρμακείο","στο φούρνο","στο περίπτερο","στο λιμάνι"],g:"το φάρμακο = le médicament → το φαρμακείο = la pharmacie. Ο φούρνος, c’est la boulangerie."},
+ {t:"b",q:"Je suis malade aujourd’hui.",a:"Είμαι άρρωστος σήμερα.",x:["είναι","έχω"],g:"Είμαι άρρωστος. Une fille ou une femme dira άρρωστη."},
+ {t:"f",s:"Πρέπει να ___ αυτό το φάρμακο τρεις φορές τη μέρα.",h:"Tu dois prendre ce médicament trois fois par jour.",o:["παίρνεις","πάρει","παίρνω"],g:"πρέπει να + verbe conjugué à la bonne personne (tu → παίρνεις). τρεις φορές τη μέρα = trois fois par jour."},
+ {t:"mc",q:"Otto s’est cogné contre sa propre carapace. Le médecin lui dit « Πρόσεξε! ». Ça veut dire…",o:["Fais attention !","Assieds-toi !","Tais-toi !","Bravo !"],g:"προσέχω (faire attention) → πρόσεξε (tu), προσέξτε (vous)."},
+ {t:"lb",q:"Je dois aller chez le médecin.",a:"Πρέπει να πάω στον γιατρό.",x:["πάει","στη"],g:"πρέπει να πάω = je dois aller. ο γιατρός est masculin → στον γιατρό."},
+ {t:"d",lines:[["Φαρμακοποιός","Θέλετε κάτι για τον βήχα;","Vous voulez quelque chose pour la toux ?"]],q:"Oui, et aussi pour la fièvre. Que dis-tu ?",o:["Ναι, και κάτι για τον πυρετό.","Όχι, είμαι πολύ ψηλός.","Ναι, ένα σουβλάκι με πατάτες.","Καλή όρεξη, ευχαριστώ."],g:"για + accusatif = pour : για τον βήχα (la toux), για τον πυρετό (la fièvre)."},
+ {t:"l",a:"Πίνε πολύ νερό και κοιμήσου νωρίς.",o:["Bois beaucoup d’eau et couche-toi tôt.","Mange beaucoup et lève-toi tôt.","Bois du vin et dors tard.","Ne bois pas d’eau après minuit."],g:"πίνε (bois, habitude) et κοιμήσου (dors, de κοιμάμαι) sont des impératifs. νωρίς = tôt, αργά = tard."},
+ {t:"mc",q:"Hippocrate, le « père de la médecine », est né à Kos. Le serment des médecins se dit…",o:["ο όρκος του Ιπποκράτη","η σαλάτα του Ιπποκράτη","το πλοίο του Ιπποκράτη","ο καφές του Ιπποκράτη"],g:"ο όρκος = le serment. του Ιπποκράτη = d’Hippocrate (génitif)."},
+ {t:"d",lines:[["Φίλη","Πώς είσαι σήμερα;","Comment vas-tu aujourd’hui ?"]],q:"Tu vas beaucoup mieux. Que réponds-tu ?",o:["Πολύ καλύτερα, ευχαριστώ!","Πολύ χειρότερα, μπράβο!","Είμαι πολύ φαρμακείο.","Καλύτερος από τον γιατρό."],g:"καλύτερα = mieux (adverbe). Pour « je vais mieux » : Είμαι καλύτερα."}
+]},
 {isle:"Όλυμπος", theme:"Pronoms et expressions",
  rules:["Pronoms compléments directs : με, σε, τον / την / το, μας, σας, τους.","Indirects (à quelqu’un) : μου, σου, του / της, μας, σας, τους.","Ils se placent avant le verbe conjugué, mais après un impératif (Δώσε μου).","Les expressions grecques adorent la mer et la cuisine !"],
  ex:[
@@ -685,6 +784,69 @@ const EXTRA_VOCAB = {
  "Όλυμπος":[["Γείτσες!","à tes souhaits !"],["Χρόνια πολλά!","joyeux anniversaire / bonne fête"],["τέλειος","parfait"],["με, σε, τον, την","me, te, le, la"]]
 };
 
+EXTRA_VOCAB["Κως"]=[["ο γιατρός","le médecin"],["το φάρμακο","le médicament"],["το φαρμακείο","la pharmacie"],["ο πυρετός","la fièvre"],["ο βήχας","la toux"],["ο λαιμός","la gorge, le cou"],["Περαστικά!","bon rétablissement !"]];
+
+/* ---------- Petites histoires (une par île) ---------- */
+const STORIES = {
+ "Αίγινα":{title:"Otto arrive à Égine",emoji:"⛴️",lines:[["Καλημέρα! Με λένε Όττο.","Bonjour ! Je m’appelle Otto."],["Είμαι αρμαδίλος.","Je suis un tatou."],["Ένα παιδί λέει: «Γεια σου!»","Un enfant dit : « Salut ! »"],["«Γεια σου! Πώς σε λένε;» ρωτάει ο Όττο.","« Salut ! Comment tu t’appelles ? » demande Otto."],["«Με λένε Νίκο. Είσαι χελώνα;»","« Je m’appelle Nikos. Tu es une tortue ? »"],["«Όχι! Δεν είμαι χελώνα!»","« Non ! Je ne suis pas une tortue ! »"],["«Συγγνώμη, Όττο!» «Δεν πειράζει, Νίκο!»","« Pardon, Otto ! » « Ce n’est pas grave, Nikos ! »"]],
+  qs:[["Comment s’appelle l’enfant ?","Nikos","Otto","Maria","Yannis"],["Pour quoi l’enfant prend-il Otto ?","une tortue","un chat","un chien","un poisson"],["Quel mot l’enfant utilise-t-il pour s’excuser ?","Συγγνώμη","Ευχαριστώ","Καλημέρα","Ναι"]]},
+ "Νάξος":{title:"Les chaussettes d’Otto",emoji:"🧦",lines:[["Ο Όττο έχει ένα σπίτι στη Νάξο.","Otto a une maison à Naxos."],["Στο σπίτι έχει δύο γάτες και ένα σκύλο.","Dans la maison, il a deux chats et un chien."],["Έχει επίσης δέκα κάλτσες.","Il a aussi dix chaussettes."],["Οι κάλτσες είναι κόκκινες, μπλε και πράσινες.","Les chaussettes sont rouges, bleues et vertes."],["Αλλά ο σκύλος τρώει τρεις κάλτσες!","Mais le chien mange trois chaussettes !"],["Τώρα ο Όττο έχει εφτά κάλτσες.","Maintenant, Otto a sept chaussettes."]],
+  qs:[["Combien de chats a Otto ?","deux","un","trois","dix"],["Qui mange les chaussettes ?","le chien","un chat","Otto","la tortue"],["Combien de chaussettes reste-t-il ?","sept","dix","trois","treize"]]},
+ "Πάρος":{title:"Otto aide Maria",emoji:"🤝",lines:[["Αυτή είναι η Μαρία. Είναι φίλη του Όττο.","Voici Maria. C’est l’amie d’Otto."],["Η Μαρία έχει ένα μεγάλο πρόβλημα.","Maria a un gros problème."],["«Όττο, είμαι κουρασμένη και δεν έχω χρόνο!»","« Otto, je suis fatiguée et je n’ai pas le temps ! »"],["«Έχεις πολλή δουλειά;» ρωτάει ο Όττο.","« Tu as beaucoup de travail ? » demande Otto."],["«Ναι, έχω πολλή δουλειά.»","« Oui, j’ai beaucoup de travail. »"],["«Εγώ έχω χρόνο! Είμαστε φίλοι, θα σε βοηθήσω.»","« Moi, j’ai le temps ! Nous sommes amis, je vais t’aider. »"]],
+  qs:[["Comment se sent Maria ?","fatiguée","en colère","malade","en retard"],["Qu’est-ce qui manque à Maria ?","le temps","l’argent","des amis","une maison"],["Que propose Otto ?","de l’aider","de dormir","de partir","d’aller manger"]]},
+ "Σύρος":{title:"Otto à la taverne",emoji:"🍽️",lines:[["Ο Όττο είναι σε μια ταβέρνα στη Σύρο.","Otto est dans une taverne à Syros."],["«Καλησπέρα! Τι θα πάρετε;» ρωτάει ο σερβιτόρος.","« Bonsoir ! Que prendrez-vous ? » demande le serveur."],["«Μια χωριάτικη σαλάτα και ένα ποτήρι νερό, παρακαλώ.»","« Une salade grecque et un verre d’eau, s’il vous plaît. »"],["«Δεν τρώτε κρέας;» «Όχι, μου αρέσουν τα μυρμήγκια!»","« Vous ne mangez pas de viande ? » « Non, j’aime les fourmis ! »"],["Ο σερβιτόρος γελάει.","Le serveur rit."],["Στο τέλος ο Όττο λέει: «Ήταν πολύ νόστιμο! Τον λογαριασμό, παρακαλώ.»","À la fin, Otto dit : « C’était délicieux ! L’addition, s’il vous plaît. »"]],
+  qs:[["Que commande Otto ?","une salade grecque et de l’eau","un souvlaki","un frappé","du vin"],["Qu’est-ce qu’Otto aime vraiment ?","les fourmis","la viande","le pain","le fromage"],["Que demande Otto à la fin ?","l’addition","le menu","un dessert","un taxi"]]},
+ "Μήλος":{title:"Une journée d’Otto",emoji:"☀️",lines:[["Ο Όττο ξυπνάει στις δώδεκα.","Otto se réveille à midi."],["Πίνει έναν καφέ και διαβάζει ένα βιβλίο.","Il boit un café et lit un livre."],["Μετά τραγουδάει στο μπάνιο.","Ensuite, il chante dans la salle de bain."],["Οι γείτονες ακούνε και γελάνε.","Les voisins écoutent et rient."],["Το απόγευμα ο Όττο μιλάει ελληνικά με τους φίλους του.","L’après-midi, Otto parle grec avec ses amis."],["Το βράδυ κοιμάται πολύ νωρίς. Είναι αρμαδίλος!","Le soir, il se couche très tôt. C’est un tatou !"]],
+  qs:[["À quelle heure Otto se réveille-t-il ?","à midi","à 6 h","à minuit","à 8 h"],["Où Otto chante-t-il ?","dans la salle de bain","à la plage","au café","dans la rue"],["Que font les voisins ?","ils rient","ils dorment","ils dansent","ils déménagent"]]},
+ "Κρήτη":{title:"La γιαγιά de Crète",emoji:"👵",lines:[["Η γιαγιά του Όττο μένει στην Κρήτη.","La grand-mère d’Otto habite en Crète."],["Είναι μικρή, αλλά πολύ δυνατή.","Elle est petite, mais très forte."],["Έχει ένα μεγάλο σπίτι και έναν άσπρο σκύλο.","Elle a une grande maison et un chien blanc."],["Κάθε μέρα μαγειρεύει για όλη την οικογένεια.","Chaque jour, elle cuisine pour toute la famille."],["«Φάε, Όττο! Είσαι πολύ αδύνατος!»","« Mange, Otto ! Tu es trop maigre ! »"],["Ο Όττο τρώει τρία πιάτα. Τώρα είναι πολύ στρογγυλός!","Otto mange trois assiettes. Maintenant, il est tout rond !"]],
+  qs:[["Où habite la grand-mère ?","en Crète","à Athènes","à Naxos","à Rhodes"],["De quelle couleur est le chien ?","blanc","noir","rouge","gris"],["Combien d’assiettes Otto mange-t-il ?","trois","une","deux","dix"]]},
+ "Ρόδος":{title:"Perdu à Rhodes",emoji:"🧭",lines:[["Ο Όττο είναι στη Ρόδο, αλλά είναι χαμένος.","Otto est à Rhodes, mais il est perdu."],["«Συγγνώμη, πού είναι το λιμάνι;» ρωτάει ο Όττο μια κυρία.","« Pardon, où est le port ? » demande Otto à une dame."],["«Πηγαίνετε ευθεία και μετά αριστερά. Είναι κοντά.»","« Allez tout droit, puis à gauche. C’est tout près. »"],["Ο Όττο πηγαίνει δεξιά.","Otto va à droite."],["Μετά από μία ώρα, είναι στην παραλία!","Une heure plus tard, il est à la plage !"],["«Δεν πειράζει», λέει. «Κάνει ζέστη, πάμε για μπάνιο!»","« Pas grave, dit-il. Il fait chaud, allons nous baigner ! »"]],
+  qs:[["Que cherche Otto ?","le port","la plage","la banque","l’hôtel"],["Où Otto va-t-il par erreur ?","à droite","à gauche","tout droit","en arrière"],["Où arrive-t-il finalement ?","à la plage","au port","à la gare","chez lui"]]},
+ "Κέρκυρα":{title:"La fête d’hier",emoji:"🎉",lines:[["Χθες ο Όττο πήγε σε ένα πάρτι στην Κέρκυρα.","Hier, Otto est allé à une fête à Corfou."],["Έφαγε πολύ και ήπιε τρεις φραπέδες.","Il a beaucoup mangé et il a bu trois frappés."],["Χόρεψε όλο το βράδυ με τους φίλους του.","Il a dansé toute la soirée avec ses amis."],["Αλλά στο τέλος έχασε το κινητό του!","Mais à la fin, il a perdu son portable !"],["Το έψαξε παντού.","Il l’a cherché partout."],["Τελικά το βρήκε… στο κέλυφός του!","Finalement, il l’a trouvé… dans sa carapace !"]],
+  qs:[["Combien de frappés Otto a-t-il bus ?","trois","un","cinq","aucun"],["Qu’a perdu Otto ?","son portable","sa carapace","son chapeau","son billet"],["Où était l’objet perdu ?","dans sa carapace","à la plage","sous la table","chez Maria"]]},
+ "Σαντορίνη":{title:"Les rêves d’Otto",emoji:"🌅",lines:[["Ο Όττο κάθεται στη Σαντορίνη και κοιτάζει τον ήλιο.","Otto est assis à Santorin et regarde le soleil."],["«Τι θα κάνεις του χρόνου;» ρωτάει η Μαρία.","« Que feras-tu l’année prochaine ? » demande Maria."],["«Θα μάθω καλά ελληνικά», λέει ο Όττο.","« J’apprendrai bien le grec », dit Otto."],["«Και μετά θα γίνω αστροναύτης!»","« Et ensuite, je deviendrai astronaute ! »"],["«Θέλεις να πας στο φεγγάρι;»","« Tu veux aller sur la Lune ? »"],["«Ναι! Αλλά πρώτα πρέπει να κοιμηθώ λίγο.»","« Oui ! Mais d’abord, je dois dormir un peu. »"]],
+  qs:[["Où est Otto ?","à Santorin","à Corfou","en Crète","à Athènes"],["Que veut-il apprendre ?","le grec","l’anglais","la danse","la cuisine"],["Que doit-il faire d’abord ?","dormir un peu","manger","appeler Maria","prendre le bateau"]]},
+ "Κάσος":{title:"Le capitaine de Kassos",emoji:"⚓",lines:[["Στο λιμάνι της Κάσου, ο καπετάνιος φωνάζει:","Au port de Kassos, le capitaine crie :"],["«Ελάτε! Το πλοίο φεύγει!»","« Venez ! Le bateau part ! »"],["«Περιμένετε!» φωνάζει ο Όττο. «Έρχομαι!»","« Attendez ! » crie Otto. « J’arrive ! »"],["Τρέχει, αλλά τα πόδια του είναι πολύ μικρά.","Il court, mais ses pattes sont toutes petites."],["«Μην ανησυχείς, Όττο», λέει ο καπετάνιος. «Ανέβα, σε περιμένουμε.»","« Ne t’inquiète pas, Otto, dit le capitaine. Monte, on t’attend. »"],["«Ευχαριστώ! Είστε ο καλύτερος καπετάνιος!»","« Merci ! Vous êtes le meilleur capitaine ! »"]],
+  qs:[["Que crie le capitaine au début ?","Venez, le bateau part !","Mangez !","Asseyez-vous !","Bonne nuit !"],["Pourquoi Otto est-il lent ?","ses pattes sont petites","il est fatigué","il a mal à la tête","il mange"],["Que fait finalement le capitaine ?","il attend Otto","il part sans lui","il se fâche","il s’endort"]]},
+ "Κάρπαθος":{title:"Le concours de danse",emoji:"💃",lines:[["Στην Κάρπαθο υπάρχει ένας διαγωνισμός χορού.","À Karpathos, il y a un concours de danse."],["Ο Γιάννης είναι πιο ψηλός από τον Όττο.","Yannis est plus grand qu’Otto."],["Η Ελένη είναι πιο γρήγορη από όλους.","Eleni est plus rapide que tout le monde."],["Αλλά ο Όττο χορεύει πιο αστεία από όλους!","Mais Otto danse plus drôlement que tout le monde !"],["Ο κόσμος γελάει και χειροκροτεί.","Les gens rient et applaudissent."],["Ο Όττο κερδίζει το βραβείο για τον πιο αστείο χορευτή!","Otto gagne le prix du danseur le plus drôle !"]],
+  qs:[["Qui est le plus grand ?","Yannis","Otto","Eleni","le public"],["Comment danse Otto ?","de façon très drôle","très vite","très lentement","très mal"],["Quel prix gagne Otto ?","le danseur le plus drôle","le plus rapide","le plus grand","le plus élégant"]]},
+ "Ικαρία":{title:"Le secret de M. Stelios",emoji:"🍅",lines:[["Στην Ικαρία ο Όττο γνωρίζει τον κύριο Στέλιο.","À Ikaria, Otto rencontre M. Stelios."],["«Πόσων χρονών είστε;» ρωτάει ο Όττο.","« Quel âge avez-vous ? » demande Otto."],["«Είμαι εκατό χρονών!»","« J’ai cent ans ! »"],["Ο κύριος Στέλιος δουλεύει στον κήπο κάθε μέρα.","M. Stelios travaille au jardin tous les jours."],["Πουλάει ντομάτες στην αγορά: δύο ευρώ το κιλό.","Il vend des tomates au marché : deux euros le kilo."],["«Ποιο είναι το μυστικό σας;» «Σιγά σιγά, Όττο. Και πολύς ύπνος!»","« Quel est votre secret ? » « Doucement, Otto. Et beaucoup de sommeil ! »"]],
+  qs:[["Quel âge a M. Stelios ?","100 ans","90 ans","60 ans","110 ans"],["Combien coûtent ses tomates ?","2 € le kilo","12 € le kilo","20 € le kilo","2 € pièce"],["Quel est son secret ?","aller doucement et beaucoup dormir","boire beaucoup de café","courir très vite","ne jamais dormir"]]},
+ "Σάμος":{title:"Le rendez-vous",emoji:"⏰",lines:[["Ο Όττο έχει ραντεβού με τη Μαρία την Παρασκευή.","Otto a rendez-vous avec Maria vendredi."],["Το ραντεβού είναι στις επτά και μισή, στο λιμάνι της Σάμου.","Le rendez-vous est à sept heures et demie, au port de Samos."],["Ο Όττο έρχεται στις οχτώ και τέταρτο.","Otto arrive à huit heures et quart."],["«Άργησες πολύ!» λέει η Μαρία.","« Tu es très en retard ! » dit Maria."],["«Συγγνώμη! Νόμιζα ότι ήταν Σάββατο!»","« Pardon ! Je croyais qu’on était samedi ! »"],["Η Μαρία γελάει: «Την άλλη φορά θα έρθω εγώ αργά!»","Maria rit : « La prochaine fois, c’est moi qui viendrai en retard ! »"]],
+  qs:[["Quel jour est le rendez-vous ?","vendredi","samedi","dimanche","lundi"],["À quelle heure Otto arrive-t-il ?","8 h 15","7 h 30","7 h 45","8 h 30"],["Pourquoi est-il en retard ?","il croyait qu’on était samedi","il dormait","il était perdu","le bateau avait du retard"]]},
+ "Ιθάκη":{title:"Le coup de fil",emoji:"📱",lines:[["Ο Όττο είναι στην Ιθάκη. Το κινητό του χτυπάει.","Otto est à Ithaque. Son portable sonne."],["«Εμπρός;» «Έλα, Όττο! Η μαμά σου είμαι!»","« Allô ? » « Coucou Otto ! C’est ta maman ! »"],["«Γεια σου, μαμά! Δεν σε ακούω καλά!»","« Salut maman ! Je ne t’entends pas bien ! »"],["«Πότε θα γυρίσεις σπίτι;»","« Quand est-ce que tu rentres à la maison ? »"],["«Σε μία εβδομάδα. Η μπαταρία μου τελειώνει!»","« Dans une semaine. Ma batterie est presque vide ! »"],["«Στείλε μου μήνυμα! Φιλιά!» Και το κινητό κλείνει.","« Envoie-moi un message ! Bisous ! » Et le portable s’éteint."]],
+  qs:[["Qui appelle Otto ?","sa maman","Maria","le médecin","le capitaine"],["Quand Otto rentre-t-il ?","dans une semaine","demain","ce soir","dans un mois"],["Pourquoi l’appel s’arrête-t-il ?","la batterie est vide","Otto raccroche","il pleut","maman est fâchée"]]},
+ "Κως":{title:"Chez le médecin",emoji:"🩺",lines:[["Ο Όττο είναι άρρωστος στην Κω.","Otto est malade à Kos."],["Τον πονάει το κεφάλι του και έχει πυρετό.","Il a mal à la tête et il a de la fièvre."],["Πηγαίνει στον γιατρό.","Il va chez le médecin."],["«Ανοίξτε το στόμα… Πείτε ααα!»","« Ouvrez la bouche… Dites aaah ! »"],["«Δεν είναι τίποτα. Πίνετε πολύ νερό και κοιμηθείτε.»","« Ce n’est rien. Buvez beaucoup d’eau et dormez. »"],["«Κοιμάμαι ήδη δεκαοχτώ ώρες τη μέρα!» λέει ο Όττο. «Περαστικά!» γελάει ο γιατρός.","« Je dors déjà dix-huit heures par jour ! » dit Otto. « Bon rétablissement ! » rit le médecin."]],
+  qs:[["Qu’est-ce qui ne va pas ?","mal à la tête et de la fièvre","mal aux pieds","mal au ventre","rien du tout"],["Que conseille le médecin ?","boire de l’eau et dormir","manger plus","courir","aller à la plage"],["Pourquoi Otto trouve-t-il ça drôle ?","il dort déjà 18 h par jour","il déteste l’eau","il n’est pas malade","le médecin est un tatou"]]},
+ "Όλυμπος":{title:"Otto sur l’Olympe",emoji:"⚡",lines:[["Στο τέλος του ταξιδιού, ο Όττο ανεβαίνει στον Όλυμπο.","À la fin du voyage, Otto monte sur l’Olympe."],["Εκεί τον περιμένει ο Δίας.","Là-haut, Zeus l’attend."],["«Μιλάς πολύ καλά ελληνικά, Όττο!»","« Tu parles très bien grec, Otto ! »"],["«Ευχαριστώ! Τα έκανα θάλασσα μερικές φορές, αλλά σιγά σιγά έμαθα.»","« Merci ! Je me suis planté quelques fois, mais petit à petit, j’ai appris. »"],["Ο Δίας του δίνει ένα στεφάνι από δάφνη.","Zeus lui donne une couronne de laurier."],["«Συγχαρητήρια, Όττο! Είσαι τέλειος!»","« Félicitations, Otto ! Tu es parfait ! »"]],
+  qs:[["Qui attend Otto ?","Zeus","Poséidon","sa grand-mère","Maria"],["Comment Otto a-t-il appris ?","petit à petit","en une journée","sans aucune faute","en dormant"],["Que reçoit Otto ?","une couronne de laurier","un éclair","un bateau","une pizza"]]}
+};
+
+/* ---------- Cartes culture ---------- */
+const CULTURE = {
+ "Αίγινα":["🥜","La pistache d’Égine","Égine est célèbre pour ses pistaches, protégées par une appellation d’origine. L’île a aussi été la toute première capitale de la Grèce moderne, en 1828.",["το φιστίκι","la pistache"]],
+ "Νάξος":["🏛️","La Portara","Près du port se dresse la Portara, l’immense porte en marbre d’un temple d’Apollon jamais achevé. Naxos est la plus grande île des Cyclades ; selon la légende, Thésée y abandonna Ariane.",["η πόρτα","la porte"]],
+ "Πάρος":["🗿","Le marbre de Paros","Le marbre blanc de Paros, très pur et légèrement translucide, était l’un des préférés des sculpteurs de l’Antiquité.",["το μάρμαρο","le marbre"]],
+ "Σύρος":["🍬","Les loukoums de Syros","Ermoúpoli, sur Syros, est la capitale administrative des Cyclades. L’île est réputée pour ses λουκούμια, des confiseries moelleuses roulées dans le sucre.",["το λουκούμι","le loukoum"]],
+ "Μήλος":["💎","La Vénus de Milo","La célèbre statue d’Aphrodite exposée au Louvre a été découverte à Milos en 1820. En grec, on l’appelle η Αφροδίτη της Μήλου.",["το άγαλμα","la statue"]],
+ "Κρήτη":["🐂","Le Minotaure","La Crète est la plus grande île grecque. À Cnossos, on visite le palais de la civilisation minoenne, que la légende associe au labyrinthe du Minotaure.",["ο λαβύρινθος","le labyrinthe"]],
+ "Ρόδος":["🗽","Le Colosse de Rhodes","Le Colosse, statue géante du dieu Soleil, était l’une des Sept Merveilles du monde antique. La vieille ville médiévale de Rhodes est inscrite au patrimoine mondial de l’UNESCO.",["ο ήλιος","le soleil"]],
+ "Κέρκυρα":["🏺","Les cruches de Pâques","À Corfou, le samedi de Pâques, les habitants jettent de grandes cruches en terre depuis leurs balcons pour chasser le malheur. Le fracas résonne dans toute la vieille ville !",["το Πάσχα","Pâques"]],
+ "Σαντορίνη":["🌋","Le volcan","Santorin est le bord d’un immense volcan. Son éruption, il y a environ 3 600 ans, a formé la caldeira et enseveli la ville d’Akrotiri sous les cendres.",["το ηφαίστειο","le volcan"]],
+ "Κάσος":["⚓","L’île des marins","Kassos est l’une des plus petites îles habitées du Dodécanèse, au sud de Karpathos. Sa petite capitale s’appelle Φρυ, et ses habitants ont une longue tradition de marins.",["ο ναύτης","le marin"]],
+ "Κάρπαθος":["👗","Le village d’Olympos","Dans le village d’Olympos, perché dans la montagne de Karpathos, des femmes portent encore le costume traditionnel au quotidien, et on y parle un dialecte aux mots très anciens.",["το χωριό","le village"]],
+ "Ικαρία":["🕰️","L’île où l’on vit vieux","Ikaria fait partie des « zones bleues », ces régions du monde qui comptent beaucoup de centenaires. Son nom viendrait d’Icare, tombé dans la mer voisine.",["εκατό χρονών","cent ans"]],
+ "Σάμος":["📐","Pythagore","Le mathématicien Pythagore est né à Samos. Le port de Pythagóreio porte son nom, et on y visite le tunnel d’Eupalinos, creusé dans la montagne il y a plus de 2 500 ans.",["το τρίγωνο","le triangle"]],
+ "Ιθάκη":["🛶","Le retour d’Ulysse","Ithaque est la patrie d’Ulysse dans l’Odyssée d’Homère. Après la guerre de Troie, il met dix ans à rentrer chez lui, où Pénélope l’attend.",["το ταξίδι","le voyage"]],
+ "Κως":["🌳","Le platane d’Hippocrate","Hippocrate, le « père de la médecine », est né à Kos. Sur une place de la ville, un très vieux platane porte son nom : la tradition dit qu’il enseignait à son ombre.",["ο γιατρός","le médecin"]],
+ "Όλυμπος":["⚡","La montagne des dieux","Avec 2 918 mètres, l’Olympe est le plus haut sommet de Grèce. Dans la mythologie, c’est la demeure des douze dieux olympiens, avec Zeus à leur tête.",["ο Δίας","Zeus"]]
+};
+
+/* ---------- Atelier alphabet ---------- */
+const ALPHA_LETTERS=[["Α α","alfa","a"],["Β β","vita","v"],["Γ γ","gama","g doux (y devant i, è)"],["Δ δ","delta","th doux (« this »)"],["Ε ε","epsilon","è"],["Ζ ζ","zita","z"],["Η η","ita","i"],["Θ θ","thita","th soufflé (« think »)"],["Ι ι","yota","i"],["Κ κ","kapa","k"],["Λ λ","lamda","l"],["Μ μ","mi","m"],["Ν ν","ni","n"],["Ξ ξ","ksi","ks"],["Ο ο","omikron","o"],["Π π","pi","p"],["Ρ ρ","ro","r roulé"],["Σ σ ς","sigma","s"],["Τ τ","taf","t"],["Υ υ","ipsilon","i"],["Φ φ","fi","f"],["Χ χ","hi","kh (comme la jota)"],["Ψ ψ","psi","ps"],["Ω ω","omega","o"]];
+const ALPHA_COMBOS=[["ου","ou"],["αι","è"],["ει","i"],["αυ","av ou af"],["ευ","èv ou èf"],["μπ","b"],["ντ","d"],["γκ","g dur"],["γγ","ng"],["τσ","ts"],["τζ","dz"]];
+const ALPHA_WORDS=[["μπανάνα","banana","banane"],["ντομάτα","domata","tomate"],["καφές","kafès","café"],["ούζο","ouzo","ouzo"],["ταξί","taksi","taxi"],["αυτοκίνητο","aftokinito","voiture"],["Ευρώπη","Èvropi","Europe"],["αγγούρι","angouri","concombre"],["τσάι","tsaï","thé"],["μπύρα","bira","bière"],["θάλασσα","thalassa","mer"],["ψωμί","psomi","pain"],["ξενοδοχείο","ksènodokhio","hôtel"],["παιδί","pèdi","enfant"],["ευχαριστώ","èfkharisto","merci"],["μουσική","moussiki","musique"],["φίλος","filos","ami"],["δέκα","dhèka","dix"],["χαρά","khara","joie"],["τζατζίκι","dzadziki","tzatziki"]];
+
 /* ---------- Tenues d’Otto ---------- */
 const HATS = {
  marin:`<path d="M-12 0 Q-12 -13 0 -14 Q12 -13 12 0 Z" fill="#1E4E8C"/><path d="M-13 -1 L17 -1 Q19 2 16 3 L-13 3 Z" fill="#163C6C"/><circle cx="-3" cy="-7" r="2" fill="#F2B705"/>`,
@@ -723,6 +885,27 @@ const SKINS = [
  {id:"pirate",  name:"Pirate",           hat:"tricorne",scarf:["#7A1020","#1F1F24","#7A1020"], prop:null, patch:true},
  {id:"nu",      name:"Otto au naturel",  hat:null,      scarf:null, prop:null}
 ];
+/* ---------- Tenues à gagner (coffre) ---------- */
+Object.assign(HATS,{
+ toque:`<path d="M-10 0 L-10 -8 Q-16 -10 -13 -17 Q-10 -23 -4 -20 Q0 -27 6 -21 Q13 -23 13 -15 Q15 -9 10 -8 L10 0Z" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/><rect x="-10" y="-4" width="20" height="4" fill="#EEF1F5" stroke="#C9CED6" stroke-width=".8"/>`,
+ crown:`<path d="M-12 0 L-12 -10 L-7 -5 L-3 -14 L0 -6 L3 -14 L7 -5 L12 -10 L12 0Z" fill="#E0B23A" stroke="#A97E14" stroke-width="1"/><circle cx="0" cy="-3" r="1.8" fill="#2E86C1"/><circle cx="-7" cy="-2.5" r="1.2" fill="#F2F2F2"/><circle cx="7" cy="-2.5" r="1.2" fill="#F2F2F2"/>`,
+ hoplite:`<path d="M-11 2 Q-12 -13 0 -14 Q12 -13 11 2 L6 2 L6 -4 L-6 -4 L-6 2Z" fill="#C08A2E" stroke="#8A5F18" stroke-width="1"/><path d="M-10 -12 Q0 -27 12 -12 Q0 -19 -10 -12Z" fill="#B3202A"/>`
+});
+Object.assign(PROPS,{
+ spoon:`<g transform="rotate(-25)"><rect x="-16" y="-4" width="24" height="3" rx="1.5" fill="#B07A43"/><ellipse cx="11" cy="-2.5" rx="6" ry="4" fill="#C58C50"/></g>`,
+ star:`<path d="M0 -22 L2.4 -15 L10 -15 L4 -10.5 L6.4 -3 L0 -7.5 L-6.4 -3 L-4 -10.5 L-10 -15 L-2.4 -15Z" fill="#F2C230" stroke="#B88A0E" stroke-width="1"/>`,
+ trident:`<g stroke="#C9A227" stroke-width="2.2" fill="none" stroke-linecap="round"><path d="M0 0 V-31"/><path d="M-6 -30 V-22 Q0 -18 6 -22 V-30"/></g>`,
+ shield:`<circle cx="0" cy="-11" r="10" fill="#C08A2E" stroke="#8A5F18" stroke-width="1.5"/><circle cx="0" cy="-11" r="4" fill="#B3202A"/>`,
+ book:`<rect x="-12" y="-10" width="24" height="9" rx="1.5" fill="#2E5E9E"/><rect x="-11" y="-9" width="22" height="2" fill="#F4ECD8"/><path d="M0 -10 V-1" stroke="#1C3F6E" stroke-width="1"/>`
+});
+SKINS.splice(SKINS.length-1,0,
+ {id:"chef",     name:"Chef de taverne",  hat:"toque",   scarf:["#D9363E","#FFFFFF","#D9363E"], prop:"spoon"},
+ {id:"astro",    name:"Astronaute",       hat:null,      scarf:["#E8EEF5","#7A8899","#E8EEF5"], prop:"star", over:`<circle cx="104" cy="57" r="21" fill="rgba(190,225,255,.28)" stroke="#D5DEE8" stroke-width="3"/><path d="M92 46 Q97 40 104 39" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" opacity=".85"/>`},
+ {id:"poseidon", name:"Poséidon",         hat:"crown",   scarf:["#1F7A8C","#BFE3E9","#1F7A8C"], prop:"trident"},
+ {id:"ulysse",   name:"Ulysse",           hat:"hoplite", scarf:["#B3202A","#C08A2E","#B3202A"], prop:"shield"},
+ {id:"savant",   name:"Savant",           hat:null,      scarf:["#6B4E9B","#E8E0F2","#6B4E9B"], prop:"book", over:`<g fill="none" stroke="#1F1F24" stroke-width="1.6"><circle cx="100" cy="55" r="5.4"/><path d="M95 53.5 L89 51"/></g>`},
+ {id:"dore",     name:"Otto en or",       hat:null,      scarf:["#F2D27A","#FFFFFF","#F2D27A"], prop:null, shell:"#D9AE3A", shellD:"#9C7716", over:`<g fill="#FFF3B0"><path d="M40 18 l1.5 4 4 1.5 -4 1.5 -1.5 4 -1.5 -4 -4 -1.5 4 -1.5Z"/><path d="M78 14 l1 3 3 1 -3 1 -1 3 -1 -3 -3 -1 3 -1Z"/><path d="M24 36 l1 3 3 1 -3 1 -1 3 -1 -3 -3 -1 3 -1Z"/></g>`}
+);
 const skinById = id => SKINS.find(s=>s.id===id) || SKINS[0];
 
 /* ---------- Otto en SVG ---------- */
@@ -748,8 +931,8 @@ ${patch}
 <circle cx="119" cy="65.5" r="2.8" fill="#6B4A4A"/>
 <path d="M104 67 Q109 70 113 68" fill="none" stroke="var(--shell-d)" stroke-width="1.8" stroke-linecap="round"/>
 <circle cx="96" cy="62" r="2.8" fill="#F29A9A" opacity=".6"/>
-${hat}
-</svg>`;
+${hat}${s.over||""}
+</svg>`.split("var(--shell-d)").join(s.shellD||"var(--shell-d)").split("var(--shell)").join(s.shell||"var(--shell)");
 }
 
 /* ---------- Phrases d’Otto ---------- */
@@ -787,24 +970,45 @@ function speak(t,slow){
 }
 function mood(id,m){const w=$(id);w.classList.remove("happy","sad");void w.offsetWidth;if(m)w.classList.add(m)}
 
+/* ---------- Coffre de tenues ---------- */
+const isleIdx=name=>LEVELS.findIndex(L=>L.isle===name);
+const SKIN_RULES={
+ olympe:  {label:"Termine l’Olympe",                ok:p=>!!p.stars[LEVELS.length-1]},
+ pirate:  {label:"Réussis 3 défis du jour",         ok:p=>(p.stats.daily||0)>=3},
+ chef:    {label:"Termine Σύρος, l’île de la taverne", ok:p=>!!p.stars[isleIdx("Σύρος")]},
+ astro:   {label:"Termine Σαντορίνη",               ok:p=>!!p.stars[isleIdx("Σαντορίνη")]},
+ poseidon:{label:"Termine 5 îles",                  ok:p=>Object.keys(p.stars).length>=5},
+ ulysse:  {label:"Termine Ιθάκη",                   ok:p=>!!p.stars[isleIdx("Ιθάκη")]},
+ savant:  {label:"Lis 5 histoires",                 ok:p=>(p.stats.stories||[]).length>=5},
+ dore:    {label:"Atteins une série de 7 jours",    ok:p=>Math.max(p.stats.best||0,p.streak||0)>=7}
+};
+function skinUnlocked(p,id){const r=SKIN_RULES[id];if(!r)return true;if(p&&p.skin===id)return true;try{return !!(p&&p.stats&&r.ok(p))}catch(e){return false}}
+function newSkins(p){const fresh=SKINS.filter(k=>skinUnlocked(p,k.id)&&!p.skinsSeen.includes(k.id));fresh.forEach(k=>p.skinsSeen.push(k.id));return fresh}
+
 /* ---------- Joueurs, sauvegarde locale et migration ---------- */
 const KEY="ottolingo-v2";
-const OLD_OLYMPE=9, NEW_OLYMPE=LEVELS.length-1;
-const newProfile=(name,skin)=>({id:"p"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),name,skin,unlocked:0,stars:{},xp:0,streak:0,last:null,rev:{}});
+const OLYMPE=LEVELS.length-1;
+const newStats=()=>({daily:0,stories:[],alpha:0,best:0});
+const newProfile=(name,skin)=>{const p={id:"p"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),name,skin,unlocked:0,stars:{},xp:0,streak:0,last:null,rev:{},stats:newStats(),daily:null,skinsSeen:[]};p.skinsSeen=SKINS.filter(k=>skinUnlocked(p,k.id)).map(k=>k.id);return p};
 function migrate(d){
   d=d&&typeof d==="object"?d:{};
   d.profiles=Array.isArray(d.profiles)?d.profiles.filter(p=>p&&p.id&&p.name):[];
   d.settings=Object.assign({noAudio:false},d.settings||{});
-  const old=!d.v||d.v<3;
+  // Où se trouvait l’Olympe dans la version qui a écrit ces données ?
+  const oldOly = d.olympeIdx!=null ? d.olympeIdx : (!d.v||d.v<3) ? 9 : 14;
   d.profiles.forEach(p=>{
     p.stars=p.stars||{};p.rev=p.rev||{};p.skin=p.skin||"marin";
     p.xp=+p.xp||0;p.streak=+p.streak||0;p.unlocked=+p.unlocked||0;
-    if(old&&p.stars[OLD_OLYMPE]!=null){p.stars[NEW_OLYMPE]=p.stars[OLD_OLYMPE];delete p.stars[OLD_OLYMPE];}
+    p.stats=Object.assign(newStats(),p.stats||{});
+    if(!Array.isArray(p.stats.stories))p.stats.stories=[];
+    p.stats.best=Math.max(p.stats.best||0,p.streak);
+    if(oldOly!==OLYMPE&&p.stars[oldOly]!=null){p.stars[OLYMPE]=p.stars[oldOly];delete p.stars[oldOly];}
     p.unlocked=Math.min(p.unlocked,LEVELS.length-1);
+    if(!Array.isArray(p.skinsSeen))p.skinsSeen=SKINS.filter(k=>skinUnlocked(p,k.id)).map(k=>k.id);
   });
-  d.v=3;return d;
+  d.v=4;d.olympeIdx=OLYMPE;return d;
 }
-let DB={v:3,profiles:[],current:null,settings:{noAudio:false}};
+let DB={v:4,olympeIdx:OLYMPE,profiles:[],current:null,settings:{noAudio:false}};
 try{
   const r=localStorage.getItem(KEY);
   if(r) DB=migrate(JSON.parse(r));
@@ -832,7 +1036,7 @@ function reviewResult(key,firstOk){
 }
 
 /* ---------- Navigation ---------- */
-const SCREENS=["who","setup","home","lesson","result","carnet","backup"];
+const SCREENS=["who","setup","home","lesson","result","carnet","backup","stories","story","cards"];
 function show(id){SCREENS.forEach(s=>$(s).hidden=s!==id);window.scrollTo(0,0)}
 
 /* ---------- Écran « Qui joue ? » ---------- */
@@ -880,12 +1084,20 @@ function openSetup(mode){
   $("setupCancel").hidden=mode==="create"&&!DB.profiles.length;
   renderSkins();show("setup");
 }
+function setupProfile(){return setupMode==="edit"&&P()?P():{skin:null,stars:{},stats:newStats(),streak:0}}
 function renderSkins(){
-  const s=skinById(setupSkin);
+  const s=skinById(setupSkin), sp=setupProfile();
   $("setupOtto").innerHTML=ottoSVG(setupSkin);
   $("setupSkinName").textContent=s.name;
-  $("skinGrid").innerHTML=SKINS.map(k=>`<button class="card ${k.id===setupSkin?"sel":""}" role="radio" aria-checked="${k.id===setupSkin}" data-skin="${k.id}"><span class="av">${ottoSVG(k.id)}</span><b>${esc(k.name)}</b></button>`).join("");
-  $("skinGrid").querySelectorAll("button").forEach(b=>b.onclick=()=>{setupSkin=b.dataset.skin;renderSkins();mood("setupOtto","happy")});
+  const free=SKINS.filter(k=>!SKIN_RULES[k.id]), prize=SKINS.filter(k=>SKIN_RULES[k.id]);
+  const card=k=>{const ok=skinUnlocked(sp,k.id);return `<button class="card ${k.id===setupSkin?"sel":""} ${ok?"":"locked"}" role="radio" aria-checked="${k.id===setupSkin}" ${ok?"":'aria-disabled="true"'} data-skin="${k.id}"><span class="av">${ottoSVG(k.id)}</span><b>${ok?"":"🔒 "}${esc(k.name)}</b>${ok?"":`<small>${esc(SKIN_RULES[k.id].label)}</small>`}</button>`};
+  $("skinGrid").innerHTML=free.map(card).join("");
+  $("prizeGrid").innerHTML=prize.map(card).join("");
+  const got=prize.filter(k=>skinUnlocked(sp,k.id)).length;
+  $("prizeCount").textContent=`${got} / ${prize.length} gagnées`;
+  document.querySelectorAll("#skinGrid button, #prizeGrid button").forEach(b=>b.onclick=()=>{
+    if(b.classList.contains("locked")){$("setupSkinName").textContent="🔒 "+SKIN_RULES[b.dataset.skin].label;mood("setupOtto","sad");return}
+    setupSkin=b.dataset.skin;renderSkins();mood("setupOtto","happy")});
 }
 $("setupGo").onclick=()=>{
   const name=$("nameIn").value.trim();
@@ -897,7 +1109,7 @@ $("setupGo").onclick=()=>{
 $("setupCancel").onclick=()=>{ if(setupMode==="edit"&&P()) goHome(); else goWho(); };
 
 /* ---------- Accueil et carte ---------- */
-const OFF=[0,26,32,10,-20,-32,-18,10,30,14,-16,-30,-10,20,0];
+const OFF=[0,26,32,10,-20,-32,-18,10,30,14,-16,-30,-10,20,28,0];
 const ROW=150;
 function goHome(){ if(!P()) return goWho(); renderHome(); show("home"); }
 function renderHome(){
@@ -923,6 +1135,13 @@ function renderHome(){
   $("revText").textContent = due ? `${due} exercice${due>1?"s":""} à revoir aujourd’hui.` : total ? "Rien à revoir aujourd’hui. Reviens demain !" : "Tes erreurs viendront ici pour être révisées.";
   $("revBtn").disabled=!due;
   $("revBtn").textContent=due?`Réviser (${Math.min(due,10)})`:"À jour ✓";
+  const dailyDone=p.daily===todayStr();
+  $("dailyText").textContent=dailyDone?"Relevé aujourd’hui. Reviens demain pour le prochain !":"5 exercices mélangés de tes îles, bonus de +15 XP.";
+  $("dailyBtn").disabled=dailyDone;
+  $("dailyBtn").textContent=dailyDone?"Fait ✓":"Relever";
+  const cards=LEVELS.filter((_,i)=>p.stars[i]).length;
+  $("cardsCount").textContent=`${cards}/${N}`;
+  $("storiesCount").textContent=`${p.stats.stories.length}/${N}`;
   // carte
   const map=$("map"), H=N*ROW;
   map.style.height=H+"px";
@@ -956,10 +1175,14 @@ $("outfitBtn").onclick=()=>openSetup("edit");
 $("carnetBtn").onclick=openCarnet;
 $("backupBtn").onclick=()=>openBackup("home");
 $("revBtn").onclick=startReview;
+$("dailyBtn").onclick=startDaily;
+$("alphaBtn").onclick=startAlpha;
+$("storiesBtn").onclick=openStories;
+$("cardsBtn").onclick=openCards;
 let resetArmed=false;
 $("resetBtn").addEventListener("click",()=>{
   if(!resetArmed){resetArmed=true;$("resetBtn").textContent="Touche encore pour effacer la progression de "+P().name;setTimeout(()=>{resetArmed=false;if(P())$("resetBtn").textContent="Recommencer mon voyage à zéro"},3500);return}
-  const p=P();Object.assign(p,{unlocked:0,stars:{},xp:0,streak:0,last:null,rev:{}});save();resetArmed=false;renderHome();
+  const p=P();Object.assign(p,{unlocked:0,stars:{},xp:0,streak:0,last:null,rev:{},daily:null});save();resetArmed=false;renderHome();
 });
 
 /* ---------- Fiche de grammaire ---------- */
@@ -979,7 +1202,7 @@ $("sheetGo").onclick=()=>{ if(sheetMode==="start"){ $("sheet").hidden=true; star
 $("sheetClose").onclick=closeSheet;
 $("sheet").addEventListener("click",e=>{if(e.target===$("sheet"))closeSheet()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("sheet").hidden)closeSheet()});
-$("ruleBtn").onclick=()=>openSheet(R.items[R.queue[0]].i,"lesson");
+$("ruleBtn").onclick=()=>{const it=R.items[R.queue[0]];if(it.i!=null)openSheet(it.i,"lesson")};
 
 /* ---------- Leçon et révision ---------- */
 let R=null;
@@ -987,7 +1210,8 @@ function begin(mode,items){
   R={mode,items,queue:items.map((_,n)=>n),total:items.length,done:0,hearts:5,sel:null,checked:false,first:{},firstOk:0,mastered:0,textOnly:false,matchErr:false};
   if(mode==="lesson")R.i=items[0].i;
   $("coachOtto").innerHTML=ottoSVG(P().skin);
-  $("hearts").hidden=mode==="review";
+  $("hearts").hidden=mode!=="lesson";
+  $("ruleBtn").hidden=mode==="alpha";
   show("lesson");renderEx();
 }
 function startLevel(i){ begin("lesson",LEVELS[i].ex.map((_,k)=>({i,k}))); }
@@ -996,7 +1220,26 @@ function startReview(){
   if(!keys.length)return;
   begin("review",keys.map(key=>{const it=parseKey(key);it.key=key;const e=LEVELS[it.i].ex[it.k];if(e.t==="b"&&audioOK()&&Math.random()<.5)it.variant="lb";return it;}));
 }
+function startDaily(){
+  const p=P();
+  let pool=LEVELS.map((_,i)=>i).filter(i=>p.stars[i]);
+  if(!pool.length)pool=[0];
+  const all=[];pool.forEach(i=>LEVELS[i].ex.forEach((_,k)=>all.push({i,k})));
+  begin("daily",shuffle(all).slice(0,5));
+}
+function alphaQuestions(){
+  const out=[], pickN=(arr,n)=>shuffle(arr).slice(0,n);
+  const uniqLetters=ALPHA_LETTERS.filter(l=>ALPHA_LETTERS.filter(m=>m[2]===l[2]).length===1);
+  const distract=(arr,correct,idx)=>{const seen=new Set([correct]);const o=[];shuffle(arr).forEach(x=>{if(o.length<3&&!seen.has(x[idx])){seen.add(x[idx]);o.push(x[idx])}});return [correct,...o]};
+  pickN(ALPHA_LETTERS,4).forEach(l=>out.push({t:"mc",q:`Comment se prononce la lettre « ${l[0]} » ?`,o:distract(ALPHA_LETTERS,l[2],2),g:`${l[0]} s’appelle « ${l[1]} » et se prononce ${l[2]}.`}));
+  pickN(uniqLetters,2).forEach(l=>out.push({t:"mc",q:`Quelle lettre se prononce ${l[2]} ?`,o:distract(uniqLetters,l[0],0),g:`C’est ${l[0]} (« ${l[1]} »).`}));
+  pickN(ALPHA_COMBOS,3).forEach(c=>out.push({t:"mc",q:`Comment se lit « ${c[0]} » ?`,o:distract(ALPHA_COMBOS,c[1],1),g:`La combinaison ${c[0]} se lit ${c[1]}. Les combinaisons de lettres sont la clé pour lire vite le grec.`}));
+  pickN(ALPHA_WORDS,3).forEach(w=>out.push({t:"mc",q:`Comment se lit « ${w[0]} » ?`,o:distract(ALPHA_WORDS,w[1],1),g:`« ${w[0]} » se lit ${w[1]} et veut dire « ${w[2]} ».`}));
+  return shuffle(out);
+}
+function startAlpha(){ begin("alpha",alphaQuestions().map(ex=>({ex}))); }
 function getEx(it){
+  if(it.ex)return it.ex;
   const e=LEVELS[it.i].ex[it.k];
   if(it.variant==="lb")return Object.assign({},e,{t:"lb"});
   return e;
@@ -1027,7 +1270,7 @@ function renderEx(){
   const listening=(e.t==="l"||e.t==="lb");
   const textMode=listening&&(R.textOnly||!audioOK());
   R.textMode=textMode;
-  $("instr").textContent = textMode ? (e.t==="l"?"Lis la phrase et choisis sa traduction.":"Traduis en grec.") : (R.mode==="review"&&!listening?"Révision : "+INSTR[e.t].toLowerCase():INSTR[e.t]);
+  $("instr").textContent = textMode ? (e.t==="l"?"Lis la phrase et choisis sa traduction.":"Traduis en grec.") : (R.mode==="alpha"?"🔤 Atelier alphabet : lis bien chaque lettre.":R.mode==="daily"?"⚡ Défi du jour : "+INSTR[e.t].toLowerCase():R.mode==="review"&&!listening?"Révision : "+INSTR[e.t].toLowerCase():INSTR[e.t]);
   const box=$("ex");
   $("lbody").scrollTop=0;
 
@@ -1141,7 +1384,7 @@ function feedback(ok){
     const firstOk = ok && !(e.t==="m"&&R.matchErr);
     R.first[n]=firstOk;
     if(firstOk)R.firstOk++;
-    if(R.mode==="lesson"&&!firstOk) markWrong(it.i,it.k);
+    if((R.mode==="lesson"||R.mode==="daily")&&!firstOk&&it.i!=null) markWrong(it.i,it.k);
     if(R.mode==="review"&&reviewResult(it.key,firstOk)) R.mastered++;
     save();
   }
@@ -1175,12 +1418,30 @@ $("checkBtn").addEventListener("click",()=>{ if(R.checked) next(); else check();
 $("quitBtn").addEventListener("click",()=>{ try{speechSynthesis.cancel()}catch(e){} save(); goHome(); });
 
 /* ---------- Fin de leçon ---------- */
-function bumpStreak(p){const t=todayStr(),y=dayStr(-1);if(p.last!==t){p.streak=(p.last===y?p.streak:0)+1;p.last=t}}
+function bumpStreak(p){const t=todayStr(),y=dayStr(-1);if(p.last!==t){p.streak=(p.last===y?p.streak:0)+1;p.last=t}p.stats.best=Math.max(p.stats.best||0,p.streak)}
+function giftLine(p){const g=newSkins(p);save();$("resGift").hidden=!g.length;if(g.length){$("resGift").innerHTML=`🎁 Nouvelle tenue débloquée : <b>${g.map(k=>esc(k.name)).join(", ")}</b> ! <button class="pill" id="giftBtn">L’essayer</button>`;$("giftBtn").onclick=()=>openSetup("edit")}}
 function finish(won){
   const p=P();
   $("resOtto").innerHTML=ottoSVG(p.skin);
-  $("resBack").hidden=false;
+  $("resBack").hidden=false;$("resStory").hidden=true;$("resGift").hidden=true;
   show("result");
+  if(R.mode==="daily"||R.mode==="alpha"){
+    const daily=R.mode==="daily";
+    const gain=R.firstOk*2+(daily?15:5);
+    p.xp+=gain;bumpStreak(p);
+    if(daily){p.daily=todayStr();p.stats.daily=(p.stats.daily||0)+1}else p.stats.alpha=(p.stats.alpha||0)+1;
+    save();
+    $("resStars").textContent=daily?"⚡":"🔤";
+    $("resTitle").textContent=daily?"Défi du jour relevé !":"Atelier alphabet terminé !";
+    $("resText").textContent=daily
+      ? `${R.firstOk} sur ${R.total} du premier coup. Ta série continue, rendez-vous demain pour un nouveau défi.`
+      : `${R.firstOk} sur ${R.total} du premier coup. Reviens quand tu veux : les questions changent à chaque fois.`;
+    $("resXp").textContent=`+${gain} XP`;$("resXp").hidden=false;
+    $("resMain").textContent=daily?"Retour à la carte":"Encore une série";
+    $("resMain").onclick=daily?goHome:startAlpha;
+    if(daily)$("resBack").hidden=true;
+    giftLine(p);mood("resOtto","happy");$("resMain").focus();return;
+  }
   if(R.mode==="review"){
     const gain=R.firstOk*2+5;
     p.xp+=gain;bumpStreak(p);save();
@@ -1191,7 +1452,7 @@ function finish(won){
     $("resXp").textContent=`+${gain} XP`;$("resXp").hidden=false;
     if(left){$("resMain").textContent=`Encore une révision (${Math.min(left,10)})`;$("resMain").onclick=startReview;}
     else{$("resMain").textContent="Retour à la carte";$("resMain").onclick=goHome;$("resBack").hidden=true;}
-    mood("resOtto","happy");$("resMain").focus();return;
+    giftLine(p);mood("resOtto","happy");$("resMain").focus();return;
   }
   const L=LEVELS[R.i];
   if(won){
@@ -1210,6 +1471,11 @@ function finish(won){
     $("resXp").textContent=`+${gain} XP`;$("resXp").hidden=false;
     $("resMain").textContent=last?"Rejouer l’Olympe":`Embarquer pour ${nx.isle}`;
     $("resMain").onclick=()=>last?startLevel(R.i):openSheet(R.i+1,"start");
+    const isle=L.isle;
+    $("resStory").hidden=false;
+    $("resStory").textContent=`📚 Lire l’histoire de ${isle}${p.stats.stories.includes(isle)?"":" (+10 XP)"} et sa carte culture`;
+    $("resStory").onclick=()=>openStory(isle);
+    giftLine(p);
     mood("resOtto","happy");
   }else{
     save();
@@ -1252,10 +1518,86 @@ function renderCarnet(){
 $("vSearch").addEventListener("input",renderCarnet);
 $("carnetBack").onclick=goHome;
 
+/* ---------- Petites histoires ---------- */
+function speakSeq(arr){
+  try{
+    if(!("speechSynthesis" in window))return;
+    speechSynthesis.cancel();
+    const v=speechSynthesis.getVoices().find(v=>v.lang&&v.lang.toLowerCase().replace("_","-").startsWith("el"));
+    arr.forEach(t=>{const u=new SpeechSynthesisUtterance(t.replace(/[«»]/g,""));u.lang="el-GR";u.rate=.85;if(v)u.voice=v;speechSynthesis.speak(u)});
+  }catch(e){}
+}
+function openStories(){
+  const p=P();
+  $("storyList").innerHTML=LEVELS.map((L,i)=>{
+    const st=STORIES[L.isle];if(!st)return "";
+    const open=!!p.stars[i], read=p.stats.stories.includes(L.isle);
+    return `<button class="story-row ${open?"":"locked"}" data-isle="${esc(L.isle)}" ${open?"":'aria-disabled="true"'}>
+      <span class="semoji">${open?st.emoji:"🔒"}</span>
+      <span><b>${open?esc(st.title):"Histoire à découvrir"}</b><small>${esc(L.isle)}${open?(read?" : lue ✓":" : nouvelle, +10 XP"):` : termine l’île ${i+1} pour la lire`}</small></span>
+    </button>`;}).join("");
+  $("storyList").querySelectorAll(".story-row").forEach(b=>b.onclick=()=>{if(!b.classList.contains("locked"))openStory(b.dataset.isle)});
+  show("stories");
+}
+let storyIsle=null, storyAnswers={};
+function openStory(isle){
+  storyIsle=isle;storyAnswers={};
+  const st=STORIES[isle], p=P();
+  $("storyOtto").innerHTML=ottoSVG(p.skin);
+  $("storyTitle").textContent=`${st.emoji} ${st.title}`;
+  $("storyIsle").textContent=isle;
+  $("storyLines").innerHTML=st.lines.map((l,n)=>`<div class="sline"><button class="speak sm" data-n="${n}" aria-label="Écouter cette phrase">🔊</button><button class="stext" data-n="${n}" aria-expanded="false"><span class="gr">${esc(l[0])}</span><small hidden>${esc(l[1])}</small></button></div>`).join("");
+  $("storyLines").querySelectorAll(".speak").forEach(b=>b.onclick=()=>speak(st.lines[+b.dataset.n][0]));
+  $("storyLines").querySelectorAll(".stext").forEach(b=>b.onclick=()=>{const sm=b.querySelector("small");sm.hidden=!sm.hidden;b.setAttribute("aria-expanded",String(!sm.hidden))});
+  $("storyAll").onclick=()=>speakSeq(st.lines.map(l=>l[0]));
+  $("storyTr").onclick=()=>{const show=[...$("storyLines").querySelectorAll("small")].some(s=>s.hidden);$("storyLines").querySelectorAll(".stext").forEach(b=>{b.querySelector("small").hidden=!show;b.setAttribute("aria-expanded",String(show))});$("storyTr").textContent=show?"Masquer les traductions":"Tout traduire"};
+  $("storyTr").textContent="Tout traduire";
+  $("storyQs").innerHTML=st.qs.map((q,n)=>{const opts=shuffle(q.slice(1));return `<div class="sq"><p><b>${n+1}. ${esc(q[0])}</b></p><div class="opts">${opts.map(o=>`<button class="opt" data-q="${n}" data-v="${esc(o)}">${esc(o)}</button>`).join("")}</div></div>`}).join("");
+  $("storyQs").querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    const n=+b.dataset.q; if(n in storyAnswers)return;
+    const right=st.qs[n][1], ok=b.dataset.v===right;
+    storyAnswers[n]=ok;
+    $("storyQs").querySelectorAll(`.opt[data-q="${n}"]`).forEach(x=>{x.disabled=true;if(x.dataset.v===right)x.classList.add("right")});
+    if(!ok)b.classList.add("wrong");
+    if(Object.keys(storyAnswers).length===st.qs.length)storyDone();
+  });
+  $("storyEnd").hidden=true;
+  const c=CULTURE[isle];
+  $("storyCard").innerHTML=c?cultureCard(isle,true):"";
+  $("storyCard").querySelectorAll(".speak").forEach(s=>s.onclick=()=>speak(s.dataset.say));
+  show("story");
+}
+function storyDone(){
+  const p=P(), st=STORIES[storyIsle], good=Object.values(storyAnswers).filter(Boolean).length;
+  let txt=`${good} bonne${good>1?"s":""} réponse${good>1?"s":""} sur ${st.qs.length}.`;
+  if(!p.stats.stories.includes(storyIsle)){p.stats.stories.push(storyIsle);p.xp+=10;txt+=" +10 XP !";}
+  const g=newSkins(p);save();
+  if(g.length)txt+=` 🎁 Nouvelle tenue débloquée : ${g.map(k=>k.name).join(", ")} !`;
+  $("storyEnd").textContent=txt;$("storyEnd").hidden=false;
+}
+$("storyBack").onclick=()=>{try{speechSynthesis.cancel()}catch(e){}openStories()};
+$("storiesBack").onclick=goHome;
+
+/* ---------- Cartes culture ---------- */
+function cultureCard(isle,open){
+  const c=CULTURE[isle];
+  if(!open)return `<div class="ccard locked"><div class="cemoji">❔</div><b>${esc(isle)}</b><p>Termine cette île pour gagner sa carte.</p></div>`;
+  return `<div class="ccard"><div class="cemoji">${c[0]}</div><b>${esc(c[1])}</b><small>${esc(isle)}</small><p>${esc(c[2])}</p><div class="cword"><span class="gr">${esc(c[3][0])}</span> = ${esc(c[3][1])} <button class="speak sm" data-say="${esc(c[3][0])}" aria-label="Écouter">🔊</button></div></div>`;
+}
+function openCards(){
+  const p=P();
+  const got=LEVELS.filter((_,i)=>p.stars[i]).length;
+  $("cardsSub").textContent=`${got} carte${got>1?"s":""} sur ${LEVELS.length}. Chaque île terminée t’en offre une.`;
+  $("cardGrid").innerHTML=LEVELS.map((L,i)=>cultureCard(L.isle,!!p.stars[i])).join("");
+  $("cardGrid").querySelectorAll(".speak").forEach(s=>s.onclick=()=>speak(s.dataset.say));
+  show("cards");
+}
+$("cardsBack").onclick=goHome;
+
 /* ---------- Sauvegarde, restauration et réglages ---------- */
 let backupFrom="home", DL=null;
-function exportData(){return {app:"ottolingo",v:3,savedAt:new Date().toISOString(),profiles:DB.profiles,settings:DB.settings}}
-function toCode(obj){const json=JSON.stringify(obj);return "OTTO3-"+btoa(unescape(encodeURIComponent(json)))}
+function exportData(){return {app:"ottolingo",v:4,olympeIdx:OLYMPE,savedAt:new Date().toISOString(),profiles:DB.profiles,settings:DB.settings}}
+function toCode(obj){const json=JSON.stringify(obj);return "OTTO4-"+btoa(unescape(encodeURIComponent(json)))}
 function fromText(txt){
   txt=(txt||"").trim();
   if(!txt)throw new Error("vide");
@@ -1298,7 +1640,7 @@ function restore(data){
 }
 $("impBtn").onclick=()=>{
   try{const n=restore(fromText($("impCode").value));msg(`${n} profil${n>1?"s":""} restauré${n>1?"s":""} : ${DB.profiles.map(p=>p.name).join(", ")}.`,true);$("expCode").value=toCode(exportData())}
-  catch(e){msg("Ce code n’est pas une sauvegarde Ottolingo valide. Vérifie qu’il est complet, il commence par OTTO3-.",false)}
+  catch(e){msg("Ce code n’est pas une sauvegarde Ottolingo valide. Vérifie qu’il est complet, il commence par OTTO suivi d’un chiffre.",false)}
 };
 $("impFile").addEventListener("change",ev=>{
   const f=ev.target.files&&ev.target.files[0];if(!f)return;
